@@ -61,7 +61,7 @@ Integrating Apache Spark Streaming into the CDC pipeline empowers organizations 
 docker-compose   up -d
 
 # Access MySQL as root user
-docker-compose -c 'mysql -u root -pdebezium'
+docker-compose  exec mysql bash -c 'mysql -u debezium -pdbz'
 
 # After authentication, execute SQL commands
 SELECT user,host FROM mysql.user;
@@ -119,10 +119,4 @@ docker-compose exec kafka /kafka/bin/kafka-console-consumer.sh \
     --from-beginning \
     --property print.key=true \
     --topic dbserver1.cdc.demo
-```
-
-```bash
-# Run Spark job
-container_id=$(docker ps --filter "name=spark-master" --format "{{.ID}}")
-docker exec -it $container_id bash -c 'spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.0 /src/real_time_pipeline.py'
 ```
