@@ -1,11 +1,11 @@
 version: '3'
 services:
 
-  # ----------------- #
-  # Apache Spark      #
-  # ----------------- #
+  # --------------------------- #
+  # Apache Spark with Delta     #
+  # --------------------------- #
   spark:
-    container_name: spark-master  
+    container_name: spark-master-delta  
     image: docker.io/bitnami/spark:3.3
     environment:
       - SPARK_MODE=master
@@ -17,7 +17,7 @@ services:
       - ./data:/data
       - ./src:/src
   spark-worker:
-    container_name: spark-worker
+    container_name: spark-worker-delta
     image: docker.io/bitnami/spark:3.3
     environment:
       - SPARK_MODE=worker
@@ -32,7 +32,7 @@ services:
   # Apache Zookeeper  #
   # ----------------- #
   zookeeper:
-    container_name: zookeeper
+    container_name: zookeeper_delta
     image: quay.io/debezium/zookeeper:2.0
     ports:
      - 2181:2181
@@ -43,7 +43,7 @@ services:
   #   apache Kafka    #
   # ----------------- #
   kafka:
-    container_name: kafka
+    container_name: kafka_delta
     image: quay.io/debezium/kafka:2.0
     ports:
      - 9092:9092
@@ -56,7 +56,7 @@ services:
   #    Kafka UI       #
   # ----------------- #
   kafka-ui:
-    container_name: kafka-ui
+    container_name: kafka-ui-delta
     image: provectuslabs/kafka-ui:latest
     ports:
       - 10000:10000
@@ -68,7 +68,7 @@ services:
   #       Mysql       #
   # ----------------- #
   mysql:
-    container_name: mysql
+    container_name: mysql_delta
     image: quay.io/debezium/example-mysql:2.0
     ports:
      - 3307:3307
@@ -76,11 +76,12 @@ services:
      - MYSQL_ROOT_PASSWORD=debezium
      - MYSQL_USER=mysqluser
      - MYSQL_PASSWORD=mysqlpw
+   
   # ----------------- #
   #     Debezium      #
   # ----------------- #
   connect:
-    container_name: debezium
+    container_name: debezium_delta
     image: quay.io/debezium/connect:2.0
     ports:
      - 8083:8083
@@ -93,3 +94,11 @@ services:
      - CONFIG_STORAGE_TOPIC=my_connect_configs 
      - OFFSET_STORAGE_TOPIC=my_connect_offsets 
      - STATUS_STORAGE_TOPIC=my_connect_statuses 
+
+  jupyter:
+    container_name: jupyter
+    image: jupyter/pyspark-notebook
+    ports:
+      - '8890:8888'
+    volumes:
+      - ./data:/data

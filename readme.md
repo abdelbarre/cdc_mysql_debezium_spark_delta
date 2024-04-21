@@ -74,12 +74,12 @@ SHOW databases;
 
 ```bash
 # Access MySQL as debezium user
-docker-compose -f docker-compose-spark-kafka-mysql.yaml exec mysql bash -c 'mysql -u debezium -pdbz'
+docker-compose  exec mysql bash -c 'mysql -u debezium -pdbz'
 ```
 
 ```sql
 # Create table in the cdc database
-CREATE TABLE cdc.example(
+CREATE TABLE cdc.demo(
     customerId int,
     customerFName varchar(255),
     customerLName varchar(255),
@@ -90,6 +90,12 @@ USE cdc;
 SHOW tables;
 ```
 
+INSERT INTO demo VALUES (1,"Richard","Hernandez","Brownsville"),\
+(2,"Mary","Barrett","Littleton"),\
+(3,"Ann","Smith","Caguas"),\
+(4,"Mary","Jones","San Marcos"),\
+(5,"Robert","Hudson","Caguas");
+
 ### Kafka Connector Debezium
 ```bash
 # Register Debezium connector
@@ -98,18 +104,18 @@ curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json"
 
 ```bash
 # List Kafka topics
-docker-compose -f docker-compose-spark-kafka-mysql.yaml exec kafka /kafka/bin/kafka-topics.sh \
+docker-compose  exec kafka /kafka/bin/kafka-topics.sh \
 --bootstrap-server kafka:9092 \
 --list
 ```
 
 ```bash
 # Consume data from Kafka topic
-docker-compose -f docker-compose-spark-kafka-mysql.yaml exec kafka /kafka/bin/kafka-console-consumer.sh \
+docker-compose exec kafka /kafka/bin/kafka-console-consumer.sh \
     --bootstrap-server kafka:9092 \
     --from-beginning \
     --property print.key=true \
-    --topic dbserver1.cdc.example
+    --topic dbserver1.cdc.demo
 ```
 
 ```bash
@@ -117,6 +123,3 @@ docker-compose -f docker-compose-spark-kafka-mysql.yaml exec kafka /kafka/bin/ka
 container_id=$(docker ps --filter "name=spark-master" --format "{{.ID}}")
 docker exec -it $container_id bash -c 'spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.0 /src/real_time_pipeline.py'
 ```
-
-
-
